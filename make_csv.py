@@ -1,4 +1,6 @@
-"""Gera metadata.csv com caminhos relativos e quoting correto."""
+"""Gera metadata.csv com caminhos relativos.
+Rodamos esse script apenas para gerar o metadata.csv
+"""
 import csv
 
 with open("metadata.csv", "w", newline="", encoding="utf-8") as csvfile:

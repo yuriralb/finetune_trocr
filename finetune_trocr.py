@@ -1,14 +1,11 @@
 """
-Fine-tuning do TrOCR com seu próprio dataset de escrita à mão.
-
-COMO USAR
-1. Descompacte o .zip (gerado pela ferramenta de coleta, ou exportado a partir
-   do Krita) numa pasta. Ela deve conter as imagens (ex: linha_001.png) mais
-   um arquivo metadata.csv com as colunas "file_name" e "text".
-2. Ajuste as variáveis da seção CONFIGURAÇÃO abaixo.
-3. Instale as dependências:
+Nome: Yuri Rocha de Albuquerque e William Victor Quintela Paixão
+Abaixo, você encontra instruções para rodar o script no seu pc. Recomendamos que 
+crie uma venv no python para instalar as dependências, para não bagunçar o seu ambiente global.
+COMO FAZER O FINE TUNNING:
+1. Instale as dependências:
    pip install transformers datasets evaluate jiwer pillow torch --break-system-packages
-4. Rode:
+2. Rode:
    python finetune_trocr.py
 """
 
@@ -28,22 +25,15 @@ from transformers import (
 )
 import evaluate
 
-# ========================= CONFIGURAÇÃO =========================
 DATASET_DIR = "./"                # pasta com metadata.csv + imagens
 OUTPUT_DIR = "./trocr-minha-letra"       # onde o modelo treinado será salvo
 
-# Checkpoint de partida. O padrão é treinado em manuscrito (inglês), o que dá
-# uma boa base visual para lidar com caligrafia. Como seu vocabulário de
-# treino é pequeno e fechado (as frases que você escreveu), o decodificador
-# consegue se adaptar ao português mesmo partindo de uma base em inglês.
-# Se os resultados ficarem estranhos no texto gerado, vale testar
-# "mazafard/trocr-finetuned-portugues" (base treinada em texto impresso em
-# português — bom vocabulário, mas encoder visual não é voltado a manuscrito).
+# modelo base do TrOCR (treinado em inglês)
 BASE_MODEL = "microsoft/trocr-base-handwritten"
 
 MAX_TARGET_LENGTH = 64      # tokens; suas frases são curtas, isso sobra
 EVAL_FRACTION = 0.1         # % dos dados reservado para validação
-EPOCHS = 30                 # dataset pequeno -> mais épocas ajuda; acompanhe o CER
+EPOCHS = 30                 # dataset pequeno -> mais épocas ajuda; 
 BATCH_SIZE = 4              # reduza se faltar memória de GPU
 LEARNING_RATE = 5e-5
 # ==================================================================
@@ -156,18 +146,6 @@ def main():
     model.save_pretrained(OUTPUT_DIR)
     processor.save_pretrained(OUTPUT_DIR)
     print(f"\nModelo salvo em: {OUTPUT_DIR}")
-
-    # teste rápido com uma frase da validação
-    if len(eval_df) > 0:
-        exemplo = eval_df.iloc[0]
-        imagem = Image.open(os.path.join(DATASET_DIR, exemplo["file_name"])).convert("RGB")
-        pixel_values = processor(imagem, return_tensors="pt").pixel_values.to(model.device)
-        generated_ids = model.generate(pixel_values)
-        texto_previsto = processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
-        print("\n--- Teste rápido ---")
-        print(f"Esperado : {exemplo['text']}")
-        print(f"Previsto : {texto_previsto}")
-
 
 if __name__ == "__main__":
     main()

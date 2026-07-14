@@ -1,7 +1,7 @@
 """
 Inferência com o modelo TrOCR puro (pré-treinado), sem fine-tuning.
 
-Útil para comparar com o modelo fine-tunado e avaliar o ganho do treinamento.
+Foi utilizado na apresentação para comparar com o modelo fine-tuned.
 
 USO:
     # Uma imagem:
@@ -20,7 +20,7 @@ from PIL import Image
 from transformers import TrOCRProcessor, VisionEncoderDecoderModel, ViTImageProcessor
 from transformers import RobertaTokenizer
 
-# Modelo pré-treinado do Hugging Face (handwritten)
+# modelo pré-treinado do Hugging Face (handwritten)
 PRETRAINED_MODEL = "microsoft/trocr-base-handwritten"
 # O decoder do TrOCR-base-handwritten usa o vocabulário do roberta-large
 DECODER_TOKENIZER = "FacebookAI/roberta-large"
